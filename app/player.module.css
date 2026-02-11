@@ -1,0 +1,381 @@
+/* ══ APP ══ */
+.app {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: none;
+}
+
+/* ══ STAGE — flat white ══ */
+.stage {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+}
+
+/* ══ CHARACTERS — no shadows ══ */
+.scene {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+}
+
+.ch {
+  position: absolute;
+  transform-origin: center bottom;
+  opacity: 0;
+  will-change: transform, opacity;
+  transition: opacity 1s ease, transform 1s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ch img {
+  height: 100%;
+  width: auto;
+  object-fit: contain;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+.ch.v {
+  opacity: 1;
+}
+
+/* Entry animations */
+.e_fadeUp {
+  transform: translateY(50px) scale(0.88);
+}
+.e_fadeUp.v {
+  transform: translateY(0) scale(1);
+}
+
+.e_slideL {
+  transform: translateX(-120px) scale(0.88);
+}
+.e_slideL.v {
+  transform: translateX(0) scale(1);
+}
+
+.e_slideR {
+  transform: translateX(120px) scale(0.88);
+}
+.e_slideR.v {
+  transform: translateX(0) scale(1);
+}
+
+.e_shake {
+  transform: scale(0.75) rotate(-4deg);
+}
+.e_shake.v {
+  transform: scale(1) rotate(0);
+}
+
+/* Idle animations */
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+@keyframes sway {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  33% {
+    transform: rotate(1.8deg);
+  }
+  66% {
+    transform: rotate(-1.8deg);
+  }
+}
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px) rotate(-0.8deg);
+  }
+  75% {
+    transform: translateX(4px) rotate(0.8deg);
+  }
+}
+
+.i_breathe {
+  animation: breathe 4.5s ease-in-out infinite;
+}
+.i_bob {
+  animation: bob 3.5s ease-in-out infinite;
+}
+.i_sway {
+  animation: sway 6s ease-in-out infinite;
+}
+.i_shake {
+  animation: shake 0.5s ease-in-out infinite;
+}
+
+/* ══ FADE ══ */
+.fade {
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 8;
+  transition: opacity 0.35s ease;
+}
+.fade.on {
+  opacity: 0.6;
+}
+
+/* ══ SUBTITLES ══ */
+.subs {
+  position: absolute;
+  bottom: max(env(safe-area-inset-bottom, 20px), 28px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 40;
+  width: min(92%, 680px);
+  text-align: center;
+  pointer-events: none;
+}
+
+.subBox {
+  display: inline-block;
+  background: transparent;
+  padding: 12px 22px;
+  max-width: 100%;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.subBox.vis {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.subBox.out {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+.subLine {
+  font-family: "Georgia", "Times New Roman", serif;
+  font-size: clamp(18px, 3.5vw, 24px);
+  line-height: 1.5;
+  color: #000;
+  letter-spacing: -0.01em;
+}
+
+.subLine.dlg {
+  color: #000;
+  font-style: italic;
+}
+
+.subLine + .subLine {
+  margin-top: 4px;
+}
+
+/* ══ PROGRESS — hairline ══ */
+.bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(0, 0, 0, 0.06);
+  z-index: 50;
+  pointer-events: none;
+}
+
+.barFill {
+  height: 100%;
+  width: 0%;
+  background: rgba(0, 0, 0, 0.18);
+  transition: width 0.2s linear;
+}
+
+/* ══ GHOST play/pause ══ */
+.ghost {
+  position: absolute;
+  top: max(env(safe-area-inset-top, 12px), 16px);
+  left: 16px;
+  z-index: 45;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.4;
+  transition: opacity 0.3s ease, transform 0.2s ease;
+  cursor: pointer;
+}
+
+.ghost:hover {
+  opacity: 1;
+}
+
+.ghost.vis {
+  opacity: 1;
+}
+
+.ghost svg {
+  width: 24px;
+  height: 24px;
+}
+
+.gPlay,
+.gPause {
+  fill: rgba(0, 0, 0, 0.4);
+}
+
+/* ══ VHS SCRUB EFFECT ══ */
+.stage.scrubbing {
+  filter: contrast(1.2) brightness(1.1) saturate(1.2);
+}
+
+.stage.scrubbing::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.03) 0px,
+    rgba(0, 0, 0, 0.03) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 10;
+  animation: vhs 0.1s infinite;
+}
+
+@keyframes vhs {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(1px); }
+}
+
+/* ══ CHAPTER NUM ══ */
+.chNum {
+  position: absolute;
+  top: max(env(safe-area-inset-top, 12px), 16px);
+  right: 16px;
+  z-index: 20;
+  font-family: "Caveat", cursive;
+  font-size: 18px;
+  color: rgba(0, 0, 0, 0.18);
+  letter-spacing: 0.5px;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+
+.chNum.vis {
+  opacity: 1;
+}
+
+/* ══ SCRUB INDICATOR ══ */
+.scrubInd {
+  position: absolute;
+  top: max(env(safe-area-inset-top, 12px), 16px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 46;
+  pointer-events: none;
+  font-family: "DM Sans", sans-serif;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.5);
+  letter-spacing: 0.5px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  padding: 6px 14px;
+}
+
+.scrubInd.vis {
+  opacity: 1;
+}
+
+/* ══ TITLE ══ */
+.title {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.title img {
+  width: min(180px, 32vw);
+  margin-bottom: 24px;
+  animation: fl 4s ease-in-out infinite;
+}
+
+@keyframes fl {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+  50% {
+    transform: translateY(-12px) rotate(1.2deg);
+  }
+}
+
+.title h1 {
+  font-family: "Caveat", cursive;
+  font-size: min(68px, 13vw);
+  color: #3e2723;
+  letter-spacing: 1px;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.title p {
+  font-family: "DM Sans", sans-serif;
+  font-size: min(17px, 3.8vw);
+  color: #8d6e63;
+  font-style: italic;
+  margin-bottom: 44px;
+}
+
+.tap {
+  font-family: "Caveat", cursive;
+  font-size: 19px;
+  color: #999;
+  animation: pu 2.5s ease-in-out infinite;
+}
+
+@keyframes pu {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.04);
+  }
+}
