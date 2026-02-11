@@ -214,8 +214,11 @@ export default function AudiobookPlayer() {
   const scrubBy = (delta: number) => {
     const au = audioRef.current;
     if (!au) return;
+    
+    // Calculate new time but let the audio keep playing
     const newT = Math.max(0, Math.min(TOTAL_DURATION - 0.1, au.currentTime + delta));
     au.currentTime = newT;
+    
     if (newT >= TOTAL_DURATION - 1) setIsEnded(true);
     else if (isEnded) setIsEnded(false);
 
@@ -229,11 +232,13 @@ export default function AudiobookPlayer() {
       scrubbingRef.current = true;
       wasPlayingRef.current = !au.paused;
       stageRef.current?.classList.add(styles.scrubbing);
+      // Ensure it's playing for the "VHS" sound effect
       if (au.paused) au.play().catch(() => {});
     }
 
     // VHS style: speed affects playback rate and pitch
-    const speed = Math.min(4, Math.max(0.4, Math.abs(delta) * 4));
+    // We use a slightly more aggressive rate for the "wind" feel
+    const speed = Math.min(4, Math.max(0.5, Math.abs(delta) * 5));
     au.playbackRate = speed;
 
     if (scrubTimerRef.current) clearTimeout(scrubTimerRef.current);
@@ -242,13 +247,15 @@ export default function AudiobookPlayer() {
       au.playbackRate = 1;
       stageRef.current?.classList.remove(styles.scrubbing);
       scrubIndRef.current?.classList.remove(styles.vis);
+      
+      // On iOS, keeping it playing is safer to avoid losing the audio context
       if (!wasPlayingRef.current) {
         au.pause();
         setPlaying(false);
       } else {
         setPlaying(true);
       }
-    }, 150);
+    }, 200); // Slightly longer timeout for smoother FF/REW feel
 
     tick();
   };
