@@ -20,6 +20,7 @@ export default function AudiobookPlayer() {
   const curSubIdx = useRef(-1);
   const [playing, setPlaying] = useState(false);
   const [titleVisible, setTitleVisible] = useState(true);
+  const [isEnded, setIsEnded] = useState(false);
   const scrubTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const scrubbingRef = useRef(false);
   const wasPlayingRef = useRef(false);
@@ -35,8 +36,10 @@ export default function AudiobookPlayer() {
     });
     // Set initial scene
     setTimeout(() => {
-      setScene(0);
-      curChapter.current = 0;
+      if (!isEnded) {
+        setScene(0);
+        curChapter.current = 0;
+      }
     }, 80);
   }, []);
 
@@ -51,11 +54,15 @@ export default function AudiobookPlayer() {
 
     const onPlay = () => {
       setPlaying(true);
+      setIsEnded(false);
     };
     const onPause = () => {
       setPlaying(false);
     };
-    const onEnded = () => setPlaying(false);
+    const onEnded = () => {
+      setPlaying(false);
+      setIsEnded(true);
+    };
     const onTimeUpdate = () => tick();
 
     au.addEventListener("play", onPlay);
@@ -209,6 +216,8 @@ export default function AudiobookPlayer() {
     if (!au) return;
     const newT = Math.max(0, Math.min(TOTAL_DURATION - 0.1, au.currentTime + delta));
     au.currentTime = newT;
+    if (newT >= TOTAL_DURATION - 1) setIsEnded(true);
+    else if (isEnded) setIsEnded(false);
 
     const ind = scrubIndRef.current;
     if (ind) {
@@ -360,10 +369,15 @@ export default function AudiobookPlayer() {
 
       {/* App */}
       <div className={styles.app}>
-        <div className={styles.stage} ref={stageRef} onClick={handleStageClick}>
+        <div className={`${styles.stage} ${isEnded ? styles.ended : ""}`} ref={stageRef} onClick={handleStageClick}>
           <div className={styles.scene} ref={sceneRef}></div>
           <div className={styles.fade} ref={fadeRef}></div>
           <div className={styles.chNum} ref={chNumRef}></div>
+
+          <div className={`${styles.endScreen} ${isEnded ? styles.vis : ""}`}>
+            <h2>Slut</h2>
+            <div className={styles.scrollMore}>Skroll ned for &aring; lese mer om Brunosso cinematic universe</div>
+          </div>
         </div>
 
         <div className={styles.subs}>

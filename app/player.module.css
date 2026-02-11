@@ -292,6 +292,51 @@
   opacity: 1;
 }
 
+.stage.ended .ch {
+  opacity: 0 !important;
+  transition: opacity 3s ease;
+}
+
+/* ══ END SCREEN ══ */
+.endScreen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 2s ease 1s;
+}
+
+.endScreen.vis {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.endScreen h2 {
+  font-family: "Caveat", cursive;
+  font-size: clamp(80px, 15vw, 120px);
+  color: #3e2723;
+  margin: 0;
+  line-height: 1;
+}
+
+.scrollMore {
+  margin-top: 20px;
+  font-family: "DM Sans", sans-serif;
+  font-size: 16px;
+  color: #8d6e63;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
 /* ══ SCRUB INDICATOR ══ */
 .scrubInd {
   position: absolute;
