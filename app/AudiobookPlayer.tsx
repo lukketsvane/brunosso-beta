@@ -60,8 +60,16 @@ export default function AudiobookPlayer() {
       setPlaying(false);
     };
     const onEnded = () => {
-      setPlaying(false);
-      setIsEnded(true);
+      if (curChapter.current < CHAPTERS.length - 1) {
+        const nextCh = curChapter.current + 1;
+        curChapter.current = nextCh;
+        au.src = `/audiobook/${CHAPTERS[nextCh].file}`;
+        au.play().catch(() => {});
+        setScene(nextCh);
+      } else {
+        setPlaying(false);
+        setIsEnded(true);
+      }
     };
     const onTimeUpdate = () => tick();
 
@@ -69,6 +77,11 @@ export default function AudiobookPlayer() {
     au.addEventListener("pause", onPause);
     au.addEventListener("ended", onEnded);
     au.addEventListener("timeupdate", onTimeUpdate);
+
+    // Initial source
+    if (!au.src && CHAPTERS.length > 0) {
+      au.src = `/audiobook/${CHAPTERS[0].file}`;
+    }
 
     return () => {
       au.removeEventListener("play", onPlay);
@@ -215,16 +228,16 @@ export default function AudiobookPlayer() {
     const au = audioRef.current;
     if (!au) return;
     
-    // Calculate new time but let the audio keep playing
-    const newT = Math.max(0, Math.min(TOTAL_DURATION - 0.1, au.currentTime + delta));
-    au.currentTime = newT;
+    // Calculate current global time
+    const curGlobalT = (CHAPTERS[curChapter.current]?.start ?? 0) + au.currentTime;
+    const newGlobalT = Math.max(0, Math.min(TOTAL_DURATION - 0.1, curGlobalT + delta));
     
-    if (newT >= TOTAL_DURATION - 1) setIsEnded(true);
+    if (newGlobalT >= TOTAL_DURATION - 1) setIsEnded(true);
     else if (isEnded) setIsEnded(false);
 
     const ind = scrubIndRef.current;
     if (ind) {
-      ind.textContent = fmt(newT);
+      ind.textContent = fmt(newGlobalT);
       ind.classList.add(styles.vis);
     }
 
@@ -235,8 +248,31 @@ export default function AudiobookPlayer() {
       if (au.paused) au.play().catch(() => {});
     }
 
+    // Find which chapter newGlobalT belongs to
+    let newCh = 0;
+    for (let i = CHAPTERS.length - 1; i >= 0; i--) {
+      if (newGlobalT >= CHAPTERS[i].start) {
+        newCh = i;
+        break;
+      }
+    }
+
+    if (newCh !== curChapter.current) {
+      curChapter.current = newCh;
+      const wasPl = !au.paused || scrubbingRef.current;
+      au.src = `/audiobook/${CHAPTERS[newCh].file}`;
+      const onMetadata = () => {
+        au.currentTime = newGlobalT - CHAPTERS[newCh].start;
+        au.removeEventListener("loadedmetadata", onMetadata);
+        if (wasPl) au.play().catch(() => {});
+      };
+      au.addEventListener("loadedmetadata", onMetadata);
+      setScene(newCh);
+    } else {
+      au.currentTime = newGlobalT - CHAPTERS[newCh].start;
+    }
+
     // VHS style: speed affects playback rate and pitch
-    // 2.0 is the "200% speed" base the user requested when dragging
     const speed = Math.min(8, Math.max(2.0, Math.abs(delta) * 10));
     au.playbackRate = speed;
 
@@ -287,7 +323,7 @@ export default function AudiobookPlayer() {
   const tick = () => {
     const au = audioRef.current;
     if (!au) return;
-    const t = au.currentTime;
+    const t = (CHAPTERS[curChapter.current]?.start ?? 0) + au.currentTime;
 
     if (barFillRef.current) {
       barFillRef.current.style.width = (t / TOTAL_DURATION) * 100 + "%";
@@ -301,8 +337,8 @@ export default function AudiobookPlayer() {
       }
     }
     if (ch !== curChapter.current) {
-      curChapter.current = ch;
-      setScene(ch);
+      // This case handles external jumps, but for normal playback onEnded handles it.
+      // We don't want to trigger src changes here too often.
     }
 
     let si = -1;
@@ -453,9 +489,7 @@ export default function AudiobookPlayer() {
         </div>
       </div>
 
-      <audio ref={audioRef} preload="auto">
-        <source src="/audiobook/audiobook.mp3" type="audio/mpeg" />
-      </audio>
+      <audio ref={audioRef} preload="auto"></audio>
     </>
   );
 }
