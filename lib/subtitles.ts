@@ -2298,13 +2298,5 @@ export const SUBS: SubCue[] = [
       "-…ja. Vil du ha?",
       "-Seff!"
     ]
-  },
-  {
-    "c": 26,
-    "t": 2302.634,
-    "d": 1.722,
-    "l": [
-      "Slutt."
-    ]
   }
 ];

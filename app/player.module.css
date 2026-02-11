@@ -297,6 +297,12 @@
   transition: opacity 3s ease;
 }
 
+/* Subtitles fade out on end */
+.app:has(.stage.ended) .subBox {
+  opacity: 0 !important;
+  transition: opacity 1.5s ease;
+}
+
 /* ══ END SCREEN ══ */
 .endScreen {
   position: absolute;
@@ -329,12 +335,12 @@
   font-family: "DM Sans", sans-serif;
   font-size: 16px;
   color: #8d6e63;
-  animation: pulse 2s ease-in-out infinite;
+  animation: pulseOpacity 2.5s ease-in-out infinite;
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 0.4; transform: scale(1); }
-  50% { opacity: 1; transform: scale(1.05); }
+@keyframes pulseOpacity {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.9; }
 }
 
 /* ══ SCRUB INDICATOR ══ */
