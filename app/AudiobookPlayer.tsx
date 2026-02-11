@@ -368,7 +368,7 @@ export default function AudiobookPlayer() {
       )}
 
       {/* App */}
-      <div className={styles.app}>
+      <div className={`${styles.app} ${isEnded ? styles.allowScroll : ""}`}>
         <div className={`${styles.stage} ${isEnded ? styles.ended : ""}`} ref={stageRef} onClick={handleStageClick}>
           <div className={styles.scene} ref={sceneRef}></div>
           <div className={styles.fade} ref={fadeRef}></div>
@@ -379,6 +379,16 @@ export default function AudiobookPlayer() {
             <div className={styles.scrollMore}>Skroll ned for &aring; lese mer om Brunosso cinematic universe</div>
           </div>
         </div>
+
+        {isEnded && (
+          <div className={styles.pdfSection}>
+            <iframe
+              src="/assets/BRUNOSSO 1.0 FULL BOOK.pdf#toolbar=0&navpanes=0&view=FitH"
+              className={styles.pdfFrame}
+              title="Brunosso Full Book"
+            />
+          </div>
+        )}
 
         <div className={styles.subs}>
           <div className={styles.subBox} ref={subBoxRef}></div>
