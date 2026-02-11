@@ -389,11 +389,16 @@ export default function AudiobookPlayer() {
 
         {isEnded && (
           <div className={styles.pdfSection}>
-            <iframe
-              src="/assets/BRUNOSSO 1.0 FULL BOOK.pdf#toolbar=0&navpanes=0&view=FitH"
+            <object
+              data="/assets/BRUNOSSO 1.0 FULL BOOK.pdf#toolbar=0&navpanes=0&view=FitH"
+              type="application/pdf"
               className={styles.pdfFrame}
-              title="Brunosso Full Book"
-            />
+            >
+              <p>
+                Din enhet støtter ikke visning av PDF direkte. 
+                <a href="/assets/BRUNOSSO 1.0 FULL BOOK.pdf">Last ned PDF her.</a>
+              </p>
+            </object>
           </div>
         )}
 
