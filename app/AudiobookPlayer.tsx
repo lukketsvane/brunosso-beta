@@ -232,13 +232,12 @@ export default function AudiobookPlayer() {
       scrubbingRef.current = true;
       wasPlayingRef.current = !au.paused;
       stageRef.current?.classList.add(styles.scrubbing);
-      // Ensure it's playing for the "VHS" sound effect
       if (au.paused) au.play().catch(() => {});
     }
 
     // VHS style: speed affects playback rate and pitch
-    // We use a slightly more aggressive rate for the "wind" feel
-    const speed = Math.min(4, Math.max(0.5, Math.abs(delta) * 5));
+    // 2.0 is the "200% speed" base the user requested when dragging
+    const speed = Math.min(8, Math.max(2.0, Math.abs(delta) * 10));
     au.playbackRate = speed;
 
     if (scrubTimerRef.current) clearTimeout(scrubTimerRef.current);
@@ -248,17 +247,42 @@ export default function AudiobookPlayer() {
       stageRef.current?.classList.remove(styles.scrubbing);
       scrubIndRef.current?.classList.remove(styles.vis);
       
-      // On iOS, keeping it playing is safer to avoid losing the audio context
       if (!wasPlayingRef.current) {
         au.pause();
         setPlaying(false);
       } else {
         setPlaying(true);
       }
-    }, 200); // Slightly longer timeout for smoother FF/REW feel
+    }, 250);
 
     tick();
   };
+
+  // Handle scroll resistance for "harder to scroll back"
+  useEffect(() => {
+    const app = document.querySelector(`.${styles.app}`);
+    if (!app || !isEnded) return;
+
+    let lastScroll = 0;
+    const handleScroll = (e: Event) => {
+      const top = (e.target as HTMLElement).scrollTop;
+      const h = window.innerHeight;
+      
+      // If we are in the "threshold" trying to go back up to the stage
+      if (top < h && top > 0) {
+        if (top < lastScroll) {
+          // Scrolling UP - add resistance by snapping back down if not scrolled enough
+          if (top < h * 0.7) {
+            // This is handled by CSS snap mostly, but we can nudge it
+          }
+        }
+      }
+      lastScroll = top;
+    };
+
+    app.addEventListener("scroll", handleScroll);
+    return () => app.removeEventListener("scroll", handleScroll);
+  }, [isEnded]);
 
   const tick = () => {
     const au = audioRef.current;

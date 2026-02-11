@@ -15,6 +15,8 @@
 .app.allowScroll {
   overflow-y: auto;
   touch-action: auto;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
 }
 
 /* ══ STAGE — flat white ══ */
@@ -25,6 +27,8 @@
   height: 100vh;
   height: 100dvh;
   flex-shrink: 0;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
 }
 
 .stage.ended {
@@ -453,6 +457,7 @@
   min-height: 100vh;
   z-index: 10;
   position: relative;
+  scroll-snap-align: start;
 }
 
 .pdfFrame {
